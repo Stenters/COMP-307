@@ -1,0 +1,29 @@
+P1:
+	classify wine test set using k-nearest neighbour
+	take two file names as cmd args (training, test)
+	write a readme.txt describing how to run the program
+	report
+		class labels of each instance in test, and accuracy of training (k=1)
+		compare vs (k=3)
+		discuss adv and disadv
+		k-fold cross validation where k=5, how do you do it
+		three clusters, no class lables. how wyou du group the examples?
+	extra: implemement clustering method
+		analysis of 3 and 5 (compare to classes)
+
+P2:
+	read csv files
+		name
+		class name	bool
+	decision tree learning algorithm
+	two command line args (training, test)
+	dec tree classifier
+		print tree in human-readable format
+		use impurity measures
+	readme.txt describing how to run program
+	report
+		classification accuracy
+		compare to baseline classifier
+		report accuracy on future runs
+		explain how to prune, disadvantages, advantages
+		why does impurity measure fall off after 2 classes
