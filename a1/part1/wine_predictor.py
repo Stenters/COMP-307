@@ -59,11 +59,7 @@ def main():
         test = open(test, 'r')
 
         dataSet = parseTrainingFile(training)
-        print(len(dataSet))
         results = parseTestFile(test, dataSet)
-
-        print([r[0].Class for r in results])
-
         grade(results)
 
 

@@ -32,6 +32,10 @@ and compare and comment on the performance of the two classifiers (k=1 and k=3).
 4. Assuming that you are asked to apply the k-fold cross validation method for the above problem
 with k=5, what would you do? State the major steps.
 
+    As the data comes in, add it (unclassified) to a list, then split the list into 5 equal (or semi-equal) lists, and iterate through, treating each one as the test set in turn.
+
 5. In the above problem, assuming that the class labels are not available in the training set and the
 test set, and that there are three clusters, which method would you use to group the examples in
 the data set? State the major steps.
+
+    
