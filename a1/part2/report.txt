@@ -1,0 +1,82 @@
+1. You should first apply your program to the hepatitis-training and hepatitis-test files and
+report the classification accuracy in terms of the fraction of the test instances that it classified
+correctly. Report the learned decision tree classifier printed by your program. Compare the
+accuracy of your Decision Tree program to the baseline classifier which always predicts the most
+frequent class in the dataset, and comment on any difference.
+
+    .
+
+2. You could then construct 10 other pairs of training/test files, train and test your classifiers on each
+pair, and calculate the average accuracy of the classifiers over the 10 trials. The files of 10 split
+10 training and test sets are provided. The files are named as hepatitis-training-run-*, and
+hepatitis-test-run-*. Each training set has 107 instances and each test set has the remaining
+30 instances. Show you working.
+
+    See Below
+
+3. “Pruning” (removing) some of leaves of the decision tree will always make the decision tree less
+accurate on the training set. Explain (a) How you could prune leaves from the decision tree; (b)
+Why it would reduce accuracy on the training set, and (c)Why it might improve accuracy on the
+test set.
+
+    .
+
+4. Explain why the impurity measure is not a good measure if there are three or more classes that
+the decision tree must distinguish.
+
+    .
+
+-------------------------------------------------------------------------------------------------
+
+
+Data for question 2:
+
+        run 0
+errors: 5
+total: 30
+%accuracy: 83.33333333333334
+
+        run 1
+errors: 6
+total: 30
+%accuracy: 80.0
+
+        run 2
+errors: 6
+total: 30
+%accuracy: 80.0
+
+        run 3
+errors: 7
+total: 30
+%accuracy: 76.66666666666666
+
+        run 4
+errors: 5
+total: 30
+%accuracy: 83.33333333333334
+
+        run 5
+errors: 7
+total: 30
+%accuracy: 76.66666666666666
+
+        run 6
+errors: 4
+total: 30
+%accuracy: 86.66666666666667
+
+        run 7
+errors: 7
+total: 30
+%accuracy: 76.66666666666666
+
+        run 8
+errors: 13
+total: 30
+%accuracy: 56.666666666666664
+
+        run 9
+errors: 8
+total: 30
+%accuracy: 73.33333333333334
