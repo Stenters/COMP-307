@@ -1,2 +1,37 @@
 for k=1, 10 errors
 for k=3, 8 errors
+
+1. Report the class labels of each instance in the test set predicted by the basic nearest neighbour
+method (where k=1), and the classification accuracy on the test set of the basic nearest neighbour
+method.
+
+    Class labels from k=1:
+[3.0, 3.0, 3.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 2.0, 2.0, 3.0, 3.0, 3.0, 1.0, 2.0, 3.0, 3.0, 1.0, 1.0, 3.0, 1.0, 2.0, 3.0, 2.0, 3.0, 2.0, 3.0, 2.0, 1.0, 2.0, 1.0, 2.0, 1.0, 1.0, 2.0, 2.0, 2.0, 2.0, 1.0, 2.0, 1.0, 3.0, 1.0, 2.0, 1.0, 3.0, 2.0, 2.0, 1.0, 3.0, 1.0, 1.0, 3.0, 3.0, 1.0, 1.0, 3.0, 1.0, 3.0, 3.0, 2.0, 2.0, 3.0, 2.0, 3.0, 3.0, 1.0, 1.0, 2.0, 1.0, 3.0, 2.0, 2.0, 1.0, 1.0, 1.0, 3.0, 2.0, 1.0, 2.0, 1.0, 3.0, 1.0, 2.0, 1.0, 1.0, 2.0, 1.0]
+
+    # incorrect classifications: 10
+    # total classifications: 89
+    % accuracy: 88.76%
+
+2. Report the classification accuracy on the test set of the k-nearest neighbour method where k=3,
+and compare and comment on the performance of the two classifiers (k=1 and k=3).
+
+    Class labels from k=3:
+[3.0, 3.0, 3.0, 1.0, 1.0, 1.0, 1.0, 2.0, 1.0, 2.0, 3.0, 3.0, 3.0, 3.0, 1.0, 2.0, 3.0, 3.0, 1.0, 1.0, 3.0, 2.0, 2.0, 3.0, 2.0, 3.0, 2.0, 3.0, 2.0, 1.0, 2.0, 1.0, 2.0, 1.0, 2.0, 2.0, 2.0, 2.0, 2.0, 1.0, 2.0, 2.0, 3.0, 1.0, 2.0, 1.0, 3.0, 2.0, 2.0, 1.0, 3.0, 1.0, 1.0, 3.0, 3.0, 1.0, 1.0, 3.0, 1.0, 3.0, 3.0, 1.0, 2.0, 3.0, 2.0, 3.0, 3.0, 1.0, 1.0, 2.0, 1.0, 3.0, 2.0, 2.0, 2.0, 1.0, 1.0, 3.0, 2.0, 1.0, 2.0, 2.0, 3.0, 1.0, 2.0, 1.0, 1.0, 2.0, 1.0]
+
+    # incorrect classifications: 8
+    # total classifications: 89
+    % accuracy: 91.01%
+    % increase (over k=1): 2.25%
+
+3. Discuss the main advantages and disadvantages of k-Nearest Neighbour method.
+
+    It is relatively accurate (almost 90% accuracy with k=1), but is computationally expensive (O(n^2) time complexity, ~O(n^2) space complexity)
+    Accuracy also tops off quickly (highest recorded was 94.38% at k=5,7)
+    Good for quick guess on smaller data sets
+
+4. Assuming that you are asked to apply the k-fold cross validation method for the above problem
+with k=5, what would you do? State the major steps.
+
+5. In the above problem, assuming that the class labels are not available in the training set and the
+test set, and that there are three clusters, which method would you use to group the examples in
+the data set? State the major steps.

@@ -20,7 +20,7 @@ class Data:
 
     vals = []
     Class = None
-    k = 3
+    k = 7
 
 
     def __init__(self, vals, Class=None):
@@ -38,7 +38,6 @@ class Data:
         return math.sqrt(res)
 
     def clasify(self, dataSet):
-        print("classifying data...")
         potentials = []
         for dataPoint in dataSet:
             dist = self.getDist(dataPoint)
@@ -60,7 +59,11 @@ def main():
         test = open(test, 'r')
 
         dataSet = parseTrainingFile(training)
+        print(len(dataSet))
         results = parseTestFile(test, dataSet)
+
+        print([r[0].Class for r in results])
+
         grade(results)
 
 
@@ -133,9 +136,14 @@ def parseTestFile(file, dataSet):
 
 
 def grade(results):
+    errors = 0
+
     for r in results:
         if r[0].Class != r[1]:
             print(f"wrong classification: {r[1]} was {r[0]}")
+            errors += 1
+
+    print(f"errors: {errors}\ntotal: 89\n%accuracy: {(1-(errors/89))*100}")
 
 
 if __name__ == "__main__":
