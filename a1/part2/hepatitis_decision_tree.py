@@ -62,6 +62,7 @@ def main():
 
 
 def BuildTree(instances, attributes):
+
     if len(instances) == 0:
         return mostProbableNode
 
@@ -236,10 +237,6 @@ def getImpurity(instanceList):
             numIsNotPresent += 1
     
     return (numIsPresent * numIsNotPresent) / (numIsPresent + numIsNotPresent)**2
-
-
-def getBestPurity(yesPurity, noPurity, prevPurity):
-    return yesPurity #(FIXME)
 
 
 def printTree(root):

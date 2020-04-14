@@ -77,7 +77,7 @@ import java.io.*;
       StringBuilder ans = new StringBuilder(categoryNames.get(category));
       ans.append(" ");
       for (Boolean val : vals)
-	ans.append(val?"true  ":"false ");
+	      ans.append(val?"true  ":"false ");
       return ans.toString();
     }
     

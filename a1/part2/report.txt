@@ -4,7 +4,68 @@ correctly. Report the learned decision tree classifier printed by your program. 
 accuracy of your Decision Tree program to the baseline classifier which always predicts the most
 frequent class in the dataset, and comment on any difference.
 
-    .
+    The baseline was actually slightly more accurate in this case. This may be due to overfitting on the training set, which would make the DT worse at unfamiliar data
+
+    baseline:
+        errors: 5
+        total: 25
+        %accuracy: 80.0
+        Class live, prob = 0.81
+ 
+    learned DT:
+        errors: 6
+        total: 25
+        %accuracy: 76.0
+
+    ascites = True:
+        spiders = True:
+                varices = True:
+                        steroid = True:
+                                Class live, prob = 1.00
+                        steroid = False:
+                                spleenpalpable = True:
+                                        firmliver = True:
+                                                Class live, prob = 1.00
+                                        firmliver = False:
+                                                bigliver = True:
+                                                        sgot = True:
+                                                                Class live, prob = 1.00
+                                                        sgot = False:
+                                                                female = True:
+                                                                        Class live, prob = 1.00
+                                                                female = False:
+                                                                        anorexia = True:
+                                                                                Class die, prob = 1.00
+                                                                        anorexia = False:
+                                                                                Class live, prob = 1.00
+                                                bigliver = False:
+                                                        Class live, prob = 1.00
+                                spleenpalpable = False:
+                                        histology = True:
+                                                Class die, prob = 1.00
+                                        histology = False:
+                                                Class live, prob = 1.00
+                varices = False:
+                        Class die, prob = 1.00
+        spiders = False:
+                bilirubin = True:
+                        fatigue = True:
+                                age = True:
+                                        Class live, prob = 1.00
+                                age = False:
+                                        Class die, prob = 1.00
+                        fatigue = False:
+                                antivirals = True:
+                                        malaise = True:
+                                                Class live, prob = 0.75
+                                        malaise = False:
+                                                Class live, prob = 0.70
+                                antivirals = False:
+                                        Class live, prob = 1.00
+                bilirubin = False:
+                        Class live, prob = 0.89
+    ascites = False:
+        Class die, prob = 0.73
 
 2. You could then construct 10 other pairs of training/test files, train and test your classifiers on each
 pair, and calculate the average accuracy of the classifiers over the 10 trials. The files of 10 split
@@ -16,15 +77,19 @@ hepatitis-test-run-*. Each training set has 107 instances and each test set has 
 
 3. “Pruning” (removing) some of leaves of the decision tree will always make the decision tree less
 accurate on the training set. Explain (a) How you could prune leaves from the decision tree; (b)
-Why it would reduce accuracy on the training set, and (c)Why it might improve accuracy on the
+Why it would reduce accuracy on the training set, and (c) Why it might improve accuracy on the
 test set.
 
-    .
+    a) You could prune the tree by saying any node with a purity above a certain amount is treated as prune
+
+    b) You would hold less tightly to the training data, so you would make more misakes
+
+    c) You would follow the trend of data, not the exact data given. Thus you might be able to predict new data better, as it follows the trend, not the training data
 
 4. Explain why the impurity measure is not a good measure if there are three or more classes that
 the decision tree must distinguish.
 
-    .
+    Impurity measure cannot arbitrate when 
 
 -------------------------------------------------------------------------------------------------
 
@@ -32,9 +97,9 @@ the decision tree must distinguish.
 Data for question 2:
 
         run 0
-errors: 5
+errors: 7
 total: 30
-%accuracy: 83.33333333333334
+%accuracy: 76.66666666666666
 
         run 1
 errors: 6
@@ -42,41 +107,41 @@ total: 30
 %accuracy: 80.0
 
         run 2
+errors: 10
+total: 30
+%accuracy: 66.66666666666667
+
+        run 3
+errors: 8
+total: 30
+%accuracy: 73.33333333333334
+
+        run 4
 errors: 6
 total: 30
 %accuracy: 80.0
 
-        run 3
-errors: 7
+        run 5
+errors: 9
 total: 30
-%accuracy: 76.66666666666666
+%accuracy: 70.0
 
-        run 4
+        run 6
+errors: 6
+total: 30
+%accuracy: 80.0
+
+        run 7
 errors: 5
 total: 30
 %accuracy: 83.33333333333334
 
-        run 5
-errors: 7
-total: 30
-%accuracy: 76.66666666666666
-
-        run 6
-errors: 4
-total: 30
-%accuracy: 86.66666666666667
-
-        run 7
-errors: 7
-total: 30
-%accuracy: 76.66666666666666
-
         run 8
-errors: 13
+errors: 11
 total: 30
-%accuracy: 56.666666666666664
+%accuracy: 63.33333333333333
 
         run 9
-errors: 8
+errors: 7
 total: 30
-%accuracy: 73.33333333333334
+%accuracy: 76.66666666666666
