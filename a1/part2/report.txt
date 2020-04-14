@@ -89,7 +89,7 @@ test set.
 4. Explain why the impurity measure is not a good measure if there are three or more classes that
 the decision tree must distinguish.
 
-    Impurity measure cannot arbitrate when 
+    Impurity measure falls behind because the number of possible lists of nodes you would have to compute would grow very quickly, making it much more computationally expensive
 
 -------------------------------------------------------------------------------------------------
 
