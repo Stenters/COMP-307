@@ -20,7 +20,6 @@ from deap import  base,creator,tools,gp,algorithms
 fp1 = 'ass2_data/part1/dataset'
 fp2 = ('ass2_data/part2/wine', 'ass2_data/part2/wine_test', 'ass2_data/part2/wine_training')
 fp3 = 'ass2_data/part3/regression'
-fp4tmp = 'ass2_data/part4/satellite'
 fp4 = ('ass2_data/part4/training.txt', 'ass2_data/part4/test.txt')
 
 
@@ -154,7 +153,7 @@ def geneticFunction():
 
     # constants
     generation = 0
-    max_generation = 40
+    max_generation = 200
     matingPB = .5
     mutatePB = .1
 
@@ -171,10 +170,12 @@ def geneticFunction():
     train = Trainer3()
     toolbox = train.toolbox
     pop = toolbox.populate(n=300)
+    hof = tools.HallOfFame(3)
 
-    algorithms.eaSimple(pop, toolbox, matingPB, mutatePB, max_generation, stats=mstats, verbose=True)
+    algorithms.eaSimple(pop, toolbox, matingPB, mutatePB, max_generation, stats=mstats, verbose=True, halloffame=hof)
+    for h in hof:
+        print(h)
     
-
 
 class Trainer3:
     toolbox = base.Toolbox()
@@ -222,7 +223,8 @@ class Trainer3:
         domain.addPrimitive(operator.mul, 2)
         # domain.addPrimitive(self.protectedDiv, 2)
         # domain.addPrimitive(operator.pow, 2)
-        domain.addEphemeralConstant("rand", lambda: random.randint(1,5))
+        # domain.addEphemeralConstant("rand", lambda: random.randint())
+        domain.addTerminal(2)
 
         creator.create('FitnessMin', base.Fitness, weights=(-1.,))
         creator.create("Instance", gp.PrimitiveTree, fitness=creator.FitnessMin)
@@ -284,15 +286,18 @@ def geneticClassification():
     train = Trainer4()
     toolbox = train.toolbox
     pop = toolbox.populate(n=300)
+    hof = tools.HallOfFame(3)
 
-    algorithms.eaSimple(pop, toolbox, matingPB, mutatePB, max_generation, stats=mstats, verbose=True)
-    
+    algorithms.eaSimple(pop, toolbox, matingPB, mutatePB, max_generation, stats=mstats, verbose=True, halloffame=hof)   
+    for h in hof:
+        print(h)
 
 
 class Trainer4:
     toolbox = base.Toolbox()
     domain = gp.PrimitiveSet('main', 1)
-    vals = []
+    trainingSet = []
+    testSet = []
 
     def protectedDiv(self, x, y):
         try:
@@ -309,45 +314,47 @@ class Trainer4:
     def grade(self, expr):
         errs = 0
         func = self.toolbox.compile(expr=expr)
-        try:
-            for x, y in self.vals:
-                if (func(x) != y):
-                    errs += 1
-            return errs / len(self.vals),
-        except OverflowError:
-            print("Overflowing on func!\n\t" + str(expr))
-            return 1,
-        except ZeroDivisionError:
-            print("ZeroDivisionError on func!\n\t" + str(expr))
-            return 1,
+        for x, y in self.trainingSet:
+            if (func(*x) != y):
+                errs += 1
+        return errs / len(self.trainingSet),
 
     def __init__(self):
-        data = open(fp3,'r')
-        data.readline()
+        training = open(fp4[0],'r')
+        test = open(fp4[1], 'r')
+        
+        for line in training.readlines():
+            line = line.split()
+            classification = line[-1]
+            features = list(map(int,line[:-1]))
+            self.trainingSet.append((features, classification))
+        
+        for line in test.readlines():
+            line = line.split()
+            classification = line[-1]
+            features = list(map(int,line[:-1]))
+            self.testSet.append((features, classification))
+            
 
-        for line in data.readlines():
-            x, y = line.split()
-            self.vals.append((float(x), float(y)))
-
-        domain = gp.PrimitiveSet('main', 1)
-        domain.addPrimitive(operator.add, 2)
-        domain.addPrimitive(operator.sub, 2)
-        domain.addPrimitive(operator.mul, 2)
-        domain.addPrimitive(self.protectedDiv, 2)
-        domain.addPrimitive(operator.pow, 2)
-        domain.addEphemeralConstant("rand", lambda: random.randint(1,5))
+        domain = gp.PrimitiveSet('main', 36)
+        domain.addPrimitive(operator.lt, 2)
+        domain.addPrimitive(operator.le, 2)
+        domain.addPrimitive(operator.eq, 2)
+        domain.addPrimitive(operator.ne, 2)
+        domain.addPrimitive(operator.ge, 2)
+        domain.addPrimitive(operator.gt, 2)
 
         creator.create('FitnessMin', base.Fitness, weights=(-1.,))
         creator.create("Instance", gp.PrimitiveTree, fitness=creator.FitnessMin)
 
         toolbox = base.Toolbox()
-        toolbox.register("expr", gp.genHalfAndHalf, pset=domain, min_=1, max_=3)
+        toolbox.register("expr", gp.genHalfAndHalf, pset=domain, min_=1, max_=5)
         toolbox.register("instance", tools.initIterate, creator.Instance, toolbox.expr)
         toolbox.register("populate", tools.initRepeat, list, toolbox.instance)
         toolbox.register("compile", gp.compile, pset=domain)
         toolbox.register("evaluate", self.grade)
         toolbox.register("mate", gp.cxOnePoint)
-        toolbox.register("expr_mutate", gp.genFull, min_=1, max_=3)
+        toolbox.register("expr_mutate", gp.genFull, min_=1, max_=5)
         toolbox.register("mutate", gp.mutUniform, expr=toolbox.expr_mutate, pset=domain)
         toolbox.register("select", tools.selTournament, tournsize=3)
         # Prevents trees from getting too tall
