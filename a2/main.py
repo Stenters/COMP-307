@@ -9,8 +9,12 @@ TODO
 '''
 
 # Packages
-import sklearn
-import deap
+import random
+import operator
+import math
+import numpy
+from sklearn.neural_network import MLPClassifier
+from deap import  base,creator,tools,gp,algorithms
 
 # File Paths
 fp1 = 'ass2_data/part1/dataset'
@@ -32,54 +36,50 @@ def perceptron():
             Report classification accuracy after 200 epochs
             Analyzse limitations for not achieving better results
     """
-    data = open(fp1, 'r')
-    perceptron = Perceptron(('f1','f2','f3'),('c1','c2'))
-    print(perceptron)
+    epochs = 10
+    net_err = 0
+    weights = [0,0,0]
+    learnRate = .1
+    bias = 0
+    data = []
+
+    datafile = open(fp1, 'r')
+    datafile.readline()
+
+    for line in datafile.readlines():
+        data.append(((int(line[0]),int(line[2]),int(line[4])), int(line[6])))
+    
+    while (epochs > 0):
+        epochs -= 1
+        iterations = 0
+        error = 0
+        
+        for line in data:
+            if predict(line[0], line[1], weights, bias, learnRate) != line[1]:
+                error += 1
+        
+            iterations += 1
+        
+        error /= iterations
+        net_err += error
+        
+    print(f"\n\tfinal bias: {bias}\n\tfinal weights: {weights}\n\tfinal error: {net_err / 10}")
 
 
-class Perceptron:
+def predict(data, classification, weights, bias, learnRate):
+    sum = bias
 
-    def __init__(self, features, classes):
-        self.output = self.Node(0)
-        self.features = []
-        self.classes = classes
+    for i in range(0,len(data)):
+        sum += data[i] * weights[i]
 
-        for i in range(1, len(features) + 1):
-            x = self.Node(i)
-            self.output.weights.append((x,0))
+    sum = 1 if sum >= 0 else 0
 
+    bias += learnRate * (classification - sum)
 
-    def classify(self, featureVector):
-        pass
+    for i in range(0, len(data)):
+        weights[i] += learnRate * (classification - sum) * data[i]
 
-    def __repr__(self):
-        return str(self.output)
-
-
-    class Node:
-        increment = .2
-
-        def __init__(self, index):
-            self.index = index
-            self.weights = []
-            self.bias = 0
-
-        def updateWeights(self, features, classification):
-            prediction = self.predict(features)
-            self.bias += self.increment * (classification - prediction)
-            
-            for i in range(0, len(self.weights)):
-                self.weights[i][1] += self.increment * (classification - prediction) * self.weights[i][0].predict(features)
-
-        def predict(self, features):
-            sum = self.bias
-            for i in range(0, len(self.weights)):
-                sum += self.weights[i][0].predict(features[i]) * self.weights[i][1]
-            
-            return [1 if sum > 0 else 0]
-
-        def __repr__(self):
-            return f"{self.index}: {[ str(x[0].index) + ', ' + str(x[1]) for x in self.weights]}"
+    return sum
 
 
 ### Part 2
@@ -89,7 +89,7 @@ def packagedNeuralNetwork():
     """
     Part 2
         Train a neural network to classify data using an existing package
-            Keras?
+            sklearn
         Reformat data for package
         Report
             Determine the network architecture (# inoput nodes, # output, # hidden nodes (assume one layer)). Describe rationale
@@ -99,7 +99,40 @@ def packagedNeuralNetwork():
             Compare vs nearest neighbor
             Describe why you used that package
     """
-    pass
+    testFeatures, testClasses = parseFile(open(fp2[1], 'r')) 
+    trainingFeatures, trainingClasses = parseFile(open(fp2[2], 'r'))
+    classifier = MLPClassifier(solver='sgd', hidden_layer_sizes=(1,13), random_state=1, verbose=False)
+
+    for i in range(1, len(trainingFeatures)-1):
+        classifier.fit(trainingFeatures[:i], trainingClasses[:i])
+        print(classifier.predict(testFeatures))
+
+    # classifier.fit(trainingFeatures, trainingClasses)
+    # res = classifier.predict(testFeatures)
+
+    # error = 0
+    # iters = 0
+    # for i in range(len(res) - 1):
+    #     if (testClasses[i] != res[i]):
+    #         error += 1
+    #     iters += 1
+    # print(res)
+    # print(testClasses)
+    # print(f"err: {error / iters}")
+
+
+def parseFile(file):
+    features = []
+    classes = []
+    file.readline()
+    for line in file.readlines():
+        vals = line.split()
+        vals = [float(x) for x in vals]
+        features.append(vals[:-1])
+        classes.append(vals[-1])
+    return features, classes
+
+### Part 3
 
 
 def geneticFunction():
@@ -118,7 +151,101 @@ def geneticFunction():
             3 diff programs and their fitness values
             Analyse one of the best programs and explain why it can solve the problem in the task
     """
-    pass
+
+    # constants
+    generation = 0
+    max_generation = 40
+    matingPB = .5
+    mutatePB = .1
+
+    # Init stats
+    stats_fit = tools.Statistics(lambda ind: ind.fitness.values)
+    stats_size = tools.Statistics(len)
+    mstats = tools.MultiStatistics(fitness=stats_fit, size=stats_size)
+    mstats.register("avg", numpy.mean)
+    mstats.register("std", numpy.std)
+    mstats.register("min", numpy.min)
+    mstats.register("max", numpy.max)
+
+    # Init population
+    train = Trainer3()
+    toolbox = train.toolbox
+    pop = toolbox.populate(n=300)
+
+    algorithms.eaSimple(pop, toolbox, matingPB, mutatePB, max_generation, stats=mstats, verbose=True)
+    
+
+
+class Trainer3:
+    toolbox = base.Toolbox()
+    domain = gp.PrimitiveSet('main', 1)
+    vals = []
+
+    def protectedDiv(self, x, y):
+        try:
+            return x / y
+        except ZeroDivisionError:
+            return 1
+
+    def protectedPow(self, x, y):
+        try:
+            return x**y
+        except ZeroDivisionError:
+            return 1
+
+    def grade(self, expr):
+        errs = 0
+        func = self.toolbox.compile(expr=expr)
+        try:
+            for x, y in self.vals:
+                if (func(x) != y):
+                    errs += 1
+            return errs / len(self.vals),
+        except OverflowError:
+            print("Overflowing on func!\n\t" + str(expr))
+            return 1,
+        except ZeroDivisionError:
+            print("ZeroDivisionError on func!\n\t" + str(expr))
+            return 1,
+
+    def __init__(self):
+        data = open(fp3,'r')
+        data.readline()
+
+        for line in data.readlines():
+            x, y = line.split()
+            self.vals.append((float(x), float(y)))
+
+        domain = gp.PrimitiveSet('main', 1)
+        domain.addPrimitive(operator.add, 2)
+        # domain.addPrimitive(operator.sub, 2)
+        domain.addPrimitive(operator.mul, 2)
+        # domain.addPrimitive(self.protectedDiv, 2)
+        # domain.addPrimitive(operator.pow, 2)
+        domain.addEphemeralConstant("rand", lambda: random.randint(1,5))
+
+        creator.create('FitnessMin', base.Fitness, weights=(-1.,))
+        creator.create("Instance", gp.PrimitiveTree, fitness=creator.FitnessMin)
+
+        toolbox = base.Toolbox()
+        toolbox.register("expr", gp.genHalfAndHalf, pset=domain, min_=1, max_=3)
+        toolbox.register("instance", tools.initIterate, creator.Instance, toolbox.expr)
+        toolbox.register("populate", tools.initRepeat, list, toolbox.instance)
+        toolbox.register("compile", gp.compile, pset=domain)
+        toolbox.register("evaluate", self.grade)
+        toolbox.register("mate", gp.cxOnePoint)
+        toolbox.register("expr_mutate", gp.genFull, min_=1, max_=3)
+        toolbox.register("mutate", gp.mutUniform, expr=toolbox.expr_mutate, pset=domain)
+        toolbox.register("select", tools.selTournament, tournsize=3)
+        # Prevents trees from getting too tall
+        toolbox.decorate("mate", gp.staticLimit(key=operator.attrgetter("height"), max_value=17))
+        toolbox.decorate("mutate", gp.staticLimit(key=operator.attrgetter("height"), max_value=17))
+
+        self.domain = domain
+        self.toolbox = toolbox
+
+
+# Part 4
 
 
 def geneticClassification():
@@ -137,12 +264,115 @@ def geneticClassification():
             3 best programs & fitness values
             analyse one of the best programs to identify paterns that you can find and why it can solve the problem
     """
-    pass
+    
+        # constants
+    generation = 0
+    max_generation = 40
+    matingPB = .5
+    mutatePB = .1
+
+    # Init stats
+    stats_fit = tools.Statistics(lambda ind: ind.fitness.values)
+    stats_size = tools.Statistics(len)
+    mstats = tools.MultiStatistics(fitness=stats_fit, size=stats_size)
+    mstats.register("avg", numpy.mean)
+    mstats.register("std", numpy.std)
+    mstats.register("min", numpy.min)
+    mstats.register("max", numpy.max)
+
+    # Init population
+    train = Trainer4()
+    toolbox = train.toolbox
+    pop = toolbox.populate(n=300)
+
+    algorithms.eaSimple(pop, toolbox, matingPB, mutatePB, max_generation, stats=mstats, verbose=True)
+    
+
+
+class Trainer4:
+    toolbox = base.Toolbox()
+    domain = gp.PrimitiveSet('main', 1)
+    vals = []
+
+    def protectedDiv(self, x, y):
+        try:
+            return x / y
+        except ZeroDivisionError:
+            return 1
+
+    def protectedPow(self, x, y):
+        try:
+            return x**y
+        except ZeroDivisionError:
+            return 1
+
+    def grade(self, expr):
+        errs = 0
+        func = self.toolbox.compile(expr=expr)
+        try:
+            for x, y in self.vals:
+                if (func(x) != y):
+                    errs += 1
+            return errs / len(self.vals),
+        except OverflowError:
+            print("Overflowing on func!\n\t" + str(expr))
+            return 1,
+        except ZeroDivisionError:
+            print("ZeroDivisionError on func!\n\t" + str(expr))
+            return 1,
+
+    def __init__(self):
+        data = open(fp3,'r')
+        data.readline()
+
+        for line in data.readlines():
+            x, y = line.split()
+            self.vals.append((float(x), float(y)))
+
+        domain = gp.PrimitiveSet('main', 1)
+        domain.addPrimitive(operator.add, 2)
+        domain.addPrimitive(operator.sub, 2)
+        domain.addPrimitive(operator.mul, 2)
+        domain.addPrimitive(self.protectedDiv, 2)
+        domain.addPrimitive(operator.pow, 2)
+        domain.addEphemeralConstant("rand", lambda: random.randint(1,5))
+
+        creator.create('FitnessMin', base.Fitness, weights=(-1.,))
+        creator.create("Instance", gp.PrimitiveTree, fitness=creator.FitnessMin)
+
+        toolbox = base.Toolbox()
+        toolbox.register("expr", gp.genHalfAndHalf, pset=domain, min_=1, max_=3)
+        toolbox.register("instance", tools.initIterate, creator.Instance, toolbox.expr)
+        toolbox.register("populate", tools.initRepeat, list, toolbox.instance)
+        toolbox.register("compile", gp.compile, pset=domain)
+        toolbox.register("evaluate", self.grade)
+        toolbox.register("mate", gp.cxOnePoint)
+        toolbox.register("expr_mutate", gp.genFull, min_=1, max_=3)
+        toolbox.register("mutate", gp.mutUniform, expr=toolbox.expr_mutate, pset=domain)
+        toolbox.register("select", tools.selTournament, tournsize=3)
+        # Prevents trees from getting too tall
+        toolbox.decorate("mate", gp.staticLimit(key=operator.attrgetter("height"), max_value=17))
+        toolbox.decorate("mutate", gp.staticLimit(key=operator.attrgetter("height"), max_value=17))
+
+        self.domain = domain
+        self.toolbox = toolbox
 
 
 if __name__ == '__main__':
-    perceptron()
-    packagedNeuralNetwork()
-    geneticFunction()
-    geneticClassification()
+    n = 3
+    # n = input("which part do you want to run? ")
+    if (int(n) == 1):
+        perceptron()
+    elif (int(n) == 2):
+        packagedNeuralNetwork()
+    elif (int(n) == 3):
+        geneticFunction()
+    elif (int(n) == 4):
+        geneticClassification()
+    else:
+        perceptron()
+        packagedNeuralNetwork()
+        geneticFunction()
+        geneticClassification()
+    
     print("All functions run!")
