@@ -2,7 +2,8 @@ fp1 = 'ass2_data/part1/dataset'
 
 def perceptron():
     # Vars
-    epochs = 10
+    epochs = 0
+    max_epochs = 200
     net_err = 0
     weights = [0,0,0]
     learnRate = .1
@@ -18,8 +19,8 @@ def perceptron():
         data.append(((int(line[0]),int(line[2]),int(line[4])), int(line[6])))
     
     # Iterate through epochs
-    while (epochs > 0):
-        epochs -= 1
+    while (epochs < max_epochs):
+        epochs += 1
 
         # Initialize vars
         iterations = 0
@@ -36,7 +37,7 @@ def perceptron():
         net_err += error
         
     # When done, print results
-    print(f"\n\tfinal bias: {bias}\n\tfinal weights: {weights}\n\tfinal error: {net_err / 10}")
+    print(f"\n\tfinal bias: {bias}\n\tfinal weights: {weights}\n\tfinal accuracy: {1 - (net_err / max_epochs)}")
 
 
 def predict(data, classification, weights, bias, learnRate):

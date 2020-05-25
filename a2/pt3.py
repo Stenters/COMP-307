@@ -9,9 +9,9 @@ fp3 = 'ass2_data/part3/regression'
 def geneticFunction():
     # Constants
     generation = 0
-    max_generations = 200
-    matingPB = .5
-    mutatePB = .1
+    max_generations = 1000
+    matingPB = .8
+    mutatePB = .4
     nTopScores = 3
     topScoresPerGen = []
 
@@ -45,8 +45,9 @@ def geneticFunction():
         print(f"Gen: {generation}\n\tMin: {min(scores)}, Max: {max(scores)}, Avg:{sum(scores) / len(scores)}")
         
     # Print best scores across the generations
-    allscores = sorted([[s for s in score] for score in topScoresPerGen][0], key=lambda x: x[0])[:nTopScores]
-    print(allscores)
+    bestScores = sorted([item for sublist in topScoresPerGen for item in sublist], key=lambda x: x[0])[:nTopScores]
+    for score in bestScores:
+        print(score[0], ": ", str(score[1]))
 
 class Trainer3:
     # Class varaibles

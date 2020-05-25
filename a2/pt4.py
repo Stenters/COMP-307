@@ -10,7 +10,7 @@ fp4 = ('ass2_data/part4/training.txt', 'ass2_data/part4/test.txt')
 def geneticClassification():
     # Constants
     generation = 0
-    max_generations = 50
+    max_generations = 100
     matingPB = .5
     mutatePB = .1
     nTopScores = 3
@@ -46,8 +46,9 @@ def geneticClassification():
         print(f"Gen: {generation}\n\tMin: {min(scores)}, Max: {max(scores)}, Avg:{sum(scores) / len(scores)}")
         
     # Print best scores across the generations
-    allscores = sorted([[s for s in score] for score in topScoresPerGen][0], key=lambda x: x[0])[:nTopScores]
-    print(allscores)
+    bestScores = sorted([item for sublist in topScoresPerGen for item in sublist], key=lambda x: x[0])[:nTopScores]
+    for score in bestScores:
+        print(score[0], ": ", str(score[1]))
 
 
 class Trainer4:

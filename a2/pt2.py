@@ -9,7 +9,7 @@ def packagedNeuralNetwork():
     # Get data from file and init the classifier
     testFeatures, testClasses = parseFile(open(fp2[0], 'r')) 
     trainingFeatures, trainingClasses = parseFile(open(fp2[1], 'r'))
-    classifier = MLPClassifier(solver='sgd', hidden_layer_sizes=(20), max_iter=1000)
+    classifier = MLPClassifier(solver='sgd', max_iter=1000)
 
     # Preprocessing
     scaler = StandardScaler()
