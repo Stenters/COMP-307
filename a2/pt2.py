@@ -1,6 +1,8 @@
 from sklearn.neural_network import MLPClassifier
+from sklearn.preprocessing import StandardScaler
+from sklearn.metrics import classification_report, confusion_matrix
 
-fp2 = ('ass2_data/part2/wine', 'ass2_data/part2/wine_test', 'ass2_data/part2/wine_training')
+fp2 = ('ass2_data/part2/wine_test', 'ass2_data/part2/wine_training')
 
 
 def packagedNeuralNetwork():
@@ -18,23 +20,33 @@ def packagedNeuralNetwork():
             Describe why you used that package
     """
     # Get data from file and init the classifier
-    testFeatures, testClasses = parseFile(open(fp2[1], 'r')) 
-    trainingFeatures, trainingClasses = parseFile(open(fp2[2], 'r'))
-    classifier = MLPClassifier(solver='sgd', hidden_layer_sizes=(1,13), random_state=1, verbose=False)
+    testFeatures, testClasses = parseFile(open(fp2[0], 'r')) 
+    trainingFeatures, trainingClasses = parseFile(open(fp2[1], 'r'))
+    classifier = MLPClassifier(solver='sgd', hidden_layer_sizes=(20))
+
+    # Preprocessing
+    scaler = StandardScaler()
+    scaler.fit(trainingFeatures)
+    trainingFeatures = scaler.transform(trainingFeatures)
+    testFeatures = scaler.transform(testFeatures)
 
     # Train the classifier, then predict the result
     classifier.fit(trainingFeatures, trainingClasses)
     res = classifier.predict(testFeatures)
 
-    # error = 0
-    # iters = 0
-    # for i in range(len(res) - 1):
-    #     if (testClasses[i] != res[i]):
-    #         error += 1
-    #     iters += 1
-    # print(res)
-    # print(testClasses)
-    # print(f"err: {error / iters}")
+    # Testing res
+    print(confusion_matrix(testClasses, res))
+    print(classification_report(testClasses, res))
+
+    error = 0
+    iters = 0
+    for i in range(len(res) - 1):
+        if (testClasses[i] != res[i]):
+            error += 1
+        iters += 1
+    print(res)
+    print(testClasses)
+    print(f"err: {error / iters}")
 
 
 def parseFile(file):

@@ -9,8 +9,7 @@ TODO
 import pt1, pt2, pt3, pt4
 
 if __name__ == '__main__':
-    n = 3
-    # n = int(input("which part do you want to run? "))
+    n = int(input("which part do you want to run? "))
     if (n == 1):
         pt1.run()
     elif (n == 2):

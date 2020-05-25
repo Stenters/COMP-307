@@ -3,8 +3,6 @@ fp1 = 'ass2_data/part1/dataset'
 def perceptron():
     """
     Part 1
-        Train a Perceptron to classify data 
-        Create data file
         Report
             Report classification accuracy after 200 epochs
             Analyzse limitations for not achieving better results
