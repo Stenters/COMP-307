@@ -1,6 +1,6 @@
 from sklearn.neural_network import MLPClassifier
 from sklearn.preprocessing import StandardScaler
-from sklearn.metrics import classification_report, confusion_matrix
+from sklearn.metrics import classification_report, confusion_matrix, accuracy_score
 
 fp2 = ('ass2_data/part2/wine_test', 'ass2_data/part2/wine_training')
 
@@ -8,9 +8,6 @@ fp2 = ('ass2_data/part2/wine_test', 'ass2_data/part2/wine_training')
 def packagedNeuralNetwork():
     """
     Part 2
-        Train a neural network to classify data using an existing package
-            sklearn
-        Reformat data for package
         Report
             Determine the network architecture (# inoput nodes, # output, # hidden nodes (assume one layer)). Describe rationale
             Determine learing parameters (inc learning rate, momentum, initial weight ranges, etc). Describe rationale
@@ -22,7 +19,7 @@ def packagedNeuralNetwork():
     # Get data from file and init the classifier
     testFeatures, testClasses = parseFile(open(fp2[0], 'r')) 
     trainingFeatures, trainingClasses = parseFile(open(fp2[1], 'r'))
-    classifier = MLPClassifier(solver='sgd', hidden_layer_sizes=(20))
+    classifier = MLPClassifier(solver='sgd', hidden_layer_sizes=(20), max_iter=1000)
 
     # Preprocessing
     scaler = StandardScaler()
@@ -33,20 +30,8 @@ def packagedNeuralNetwork():
     # Train the classifier, then predict the result
     classifier.fit(trainingFeatures, trainingClasses)
     res = classifier.predict(testFeatures)
-
-    # Testing res
-    print(confusion_matrix(testClasses, res))
-    print(classification_report(testClasses, res))
-
-    error = 0
-    iters = 0
-    for i in range(len(res) - 1):
-        if (testClasses[i] != res[i]):
-            error += 1
-        iters += 1
-    print(res)
-    print(testClasses)
-    print(f"err: {error / iters}")
+    accuracy = accuracy_score(testClasses, res)
+    print("accuracy of prediction: ", accuracy)
 
 
 def parseFile(file):
