@@ -7,21 +7,6 @@ from deap import  base,creator,tools,gp,algorithms
 fp3 = 'ass2_data/part3/regression'
 
 def geneticFunction():
-    """
-    Part 3
-        Use genetic programming to generate a mathematic function to relate inputs and outputs
-        Use existing package
-            DEAP?
-        
-        Report
-            Terminal set
-            Function set
-            Fitness function (desc in plain language && math function)
-            Parameter values & stopping criteria
-            Mean squared error for 10 random runs and avg value
-            3 diff programs and their fitness values
-            Analyse one of the best programs and explain why it can solve the problem in the task
-    """
     # Constants
     generation = 0
     max_generations = 200
@@ -43,6 +28,7 @@ def geneticFunction():
 
         offspring = list(map(toolbox.clone, toolbox.select(pop, len(pop))))
 
+        # Mate and mutate random selections of the offspring
         for c1,c2 in zip(offspring[::2], offspring[1::2]):
             if random.random() < matingPB:
                 toolbox.mate(c1, c2)
@@ -50,21 +36,26 @@ def geneticFunction():
             if random.random() < mutatePB:
                 toolbox.mutate(o)
         
+        # Shallow copy offspring and re-evaluate scores
         pop[:] = offspring
         scores = [toolbox.evaluate(p)[0] for p in pop]
 
+        # Record the best scores and print the generation results
         topScoresPerGen.append(sorted(zip(scores, pop), key=lambda x: x[0])[:nTopScores])
         print(f"Gen: {generation}\n\tMin: {min(scores)}, Max: {max(scores)}, Avg:{sum(scores) / len(scores)}")
         
-    for score in topScoresPerGen[-1]:
-        print(score[0], ": ", str(score[1]))
+    # Print best scores across the generations
+    allscores = sorted([[s for s in score] for score in topScoresPerGen][0], key=lambda x: x[0])[:nTopScores]
+    print(allscores)
 
 class Trainer3:
+    # Class varaibles
     toolbox = None
     domain = None
     vals = []
 
     def protectedDiv(self, x, y):
+        # Used to make sure iterations don't throw an error
         try:
             return x / y
         except ZeroDivisionError:
@@ -79,6 +70,7 @@ class Trainer3:
         return errs / len(self.vals),
 
     def __init__(self):
+        # Parse data
         data = open(fp3,'r')
         data.readline()
 
@@ -86,17 +78,19 @@ class Trainer3:
             x, y = line.split()
             self.vals.append((float(x), float(y)))
 
+        # Construct the domain for solving the problem
         domain = gp.PrimitiveSet('main', 1)
         domain.addPrimitive(operator.add, 2)
         domain.addPrimitive(operator.sub, 2)
         domain.addPrimitive(operator.mul, 2)
         domain.addPrimitive(self.protectedDiv, 2)
-        # domain.addPrimitive(operator.pow, 2)
         domain.addEphemeralConstant("rand", lambda: random.randint(1,5))
 
+        # Use a fitness that minimizes error
         creator.create('FitnessMin', base.Fitness, weights=(-1.,))
         creator.create("Instance", gp.PrimitiveTree, fitness=creator.FitnessMin)
 
+        # Register all the functions we need
         toolbox = base.Toolbox()
         toolbox.register("expr", gp.genHalfAndHalf, pset=domain, min_=1, max_=3)
         toolbox.register("instance", tools.initIterate, creator.Instance, toolbox.expr)

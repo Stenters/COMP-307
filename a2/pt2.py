@@ -6,16 +6,6 @@ fp2 = ('ass2_data/part2/wine_test', 'ass2_data/part2/wine_training')
 
 
 def packagedNeuralNetwork():
-    """
-    Part 2
-        Report
-            Determine the network architecture (# inoput nodes, # output, # hidden nodes (assume one layer)). Describe rationale
-            Determine learing parameters (inc learning rate, momentum, initial weight ranges, etc). Describe rationale
-            Determine termination criteria. Describe rationale
-            Report reults (10 independent experiments with different random seeds) on training and test. Analyse results and make conclusions
-            Compare vs nearest neighbor
-            Describe why you used that package
-    """
     # Get data from file and init the classifier
     testFeatures, testClasses = parseFile(open(fp2[0], 'r')) 
     trainingFeatures, trainingClasses = parseFile(open(fp2[1], 'r'))

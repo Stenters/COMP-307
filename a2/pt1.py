@@ -1,12 +1,6 @@
 fp1 = 'ass2_data/part1/dataset'
 
 def perceptron():
-    """
-    Part 1
-        Report
-            Report classification accuracy after 200 epochs
-            Analyzse limitations for not achieving better results
-    """
     # Vars
     epochs = 10
     net_err = 0

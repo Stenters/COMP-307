@@ -8,21 +8,6 @@ fp4 = ('ass2_data/part4/training.txt', 'ass2_data/part4/test.txt')
 
 
 def geneticClassification():
-    """
-    Part 4
-        classify data set using GP
-            195 instances; 75 anomaly; 120 normal (36 features [25-175])
-        create data files (training.txt & test.txt)
-        Report
-            terminal set
-            function set
-            Fitness function (desc in plain language && math function)
-            Parameter values & stopping criteria
-            Desciribe considerations creating test and training split
-            classification accuracy (over 10 random runs) on training & test
-            3 best programs & fitness values
-            analyse one of the best programs to identify paterns that you can find and why it can solve the problem
-    """
     # Constants
     generation = 0
     max_generations = 50
@@ -44,6 +29,7 @@ def geneticClassification():
 
         offspring = list(map(toolbox.clone, toolbox.select(pop, len(pop))))
 
+        # Mate and mutate a random selection
         for c1,c2 in zip(offspring[::2], offspring[1::2]):
             if random.random() < matingPB:
                 toolbox.mate(c1, c2)
@@ -51,17 +37,21 @@ def geneticClassification():
             if random.random() < mutatePB:
                 toolbox.mutate(o)
         
+        # Shallow copy offspring and re-evaluate scores
         pop[:] = offspring
         scores = [toolbox.evaluate(p)[0] for p in pop]
 
+        # Record n best scores and print generation results
         topScoresPerGen.append(sorted(zip(scores, pop), key=lambda x: x[0])[:nTopScores])
         print(f"Gen: {generation}\n\tMin: {min(scores)}, Max: {max(scores)}, Avg:{sum(scores) / len(scores)}")
         
-    for score in topScoresPerGen[-1]:
-        print(score[0], ": ", str(score[1]))
+    # Print best scores across the generations
+    allscores = sorted([[s for s in score] for score in topScoresPerGen][0], key=lambda x: x[0])[:nTopScores]
+    print(allscores)
 
 
 class Trainer4:
+    # Class variables
     toolbox = base.Toolbox()
     domain = gp.PrimitiveSet('main', 1)
     trainingSet = []
@@ -97,8 +87,10 @@ class Trainer4:
             self.testSet.append((features, classification))
 
     def __init__(self):
+        # Parse the training and test files
         self.parseFiles(open(fp4[0], 'r'), open(fp4[1], 'r'))
 
+        # Construct the domain
         domain = gp.PrimitiveSet('main', 36)
         domain.addPrimitive(operator.lt, 2)
         domain.addPrimitive(operator.le, 2)
@@ -107,9 +99,11 @@ class Trainer4:
         domain.addPrimitive(operator.ge, 2)
         domain.addPrimitive(operator.gt, 2)
 
+        # Want the instances with the lowest error
         creator.create('FitnessMin', base.Fitness, weights=(-1.,))
         creator.create("Instance", gp.PrimitiveTree, fitness=creator.FitnessMin)
 
+        # Register all the functions we will need
         toolbox = base.Toolbox()
         toolbox.register("expr", gp.genHalfAndHalf, pset=domain, min_=1, max_=5)
         toolbox.register("instance", tools.initIterate, creator.Instance, toolbox.expr)
@@ -125,6 +119,7 @@ class Trainer4:
         toolbox.decorate("mate", gp.staticLimit(key=operator.attrgetter("height"), max_value=17))
         toolbox.decorate("mutate", gp.staticLimit(key=operator.attrgetter("height"), max_value=17))
 
+        # Save intitalized objects
         self.domain = domain
         self.toolbox = toolbox
 
